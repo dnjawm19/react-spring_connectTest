@@ -43,13 +43,14 @@ const App = () => {
     }
   };
 
-  const onClickSignup = async () => {
+  const onClickSignup = async (e) => {
+    e.preventDefault();
     try{
       const response = await axios.post(
         'http://localhost:8080/auth/signup', {
-          "userName" : "211",
-          "nickName": "정수123",
-          "password": "asd"
+          "userName" : e.currentTarget.id.value,
+          "nickName": e.currentTarget.nickName.value,
+          "password": e.currentTarget.password.value
         }
       );
       setAccountSignup(response.data);
@@ -58,12 +59,13 @@ const App = () => {
     }
   };
 
-  const onClickLogin = async () => {
+  const onClickLogin = async (e) => {
+    e.preventDefault();
     try{
       const response = await axios.post(
         'http://localhost:8080/auth/login', {
-          "userName" : "211",
-          "password": "asd",
+          "userName" : e.currentTarget.id.value,
+          "password": e.currentTarget.password.value,
         },
       );
       setAccountLogin(response.data);
@@ -103,10 +105,9 @@ const App = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    const content = "내용";
     const formData = new FormData(e.currentTarget);
     const files = e.currentTarget.files;
-    formData.append('content', content);
+    formData.append('content', e.currentTarget.content.value);
     for (let i = 0; i < files?.length; i++) {
       formData.append('files', files[i]);
     }
@@ -157,6 +158,7 @@ const App = () => {
       <div>
         <button onClick={onClickGetPost2}>전체 게시글 조회2</button>
         <br/>
+        <br/>
         {data2.map((post) => (
           <div key={post.id}>
             <div>postId = {post.postId}</div>
@@ -172,15 +174,24 @@ const App = () => {
         ))}
       </div>
       <div>
-        <button onClick={onClickSignup}>회원가입</button>
-        <br/>
+        <h3>회원가입</h3>
+        <FormBox onSubmit={onClickSignup}>
+          <input type="text" name="id" placeholder="아이디를 입력해 주세요"/>
+          <input type="text" name="nickName" placeholder="닉네임을 입력해 주세요"/>
+          <input type="text" name="password" placeholder="비밀번호를 입력해 주세요"/>
+          <button type="submit">회원가입</button>
+        </FormBox>
         <br/>
         <div>{accountSignup && <textarea rows={4} value={JSON.stringify(accountSignup, null, 2)}readOnly={true}/>}</div>
       </div>
       <br/>
       <div>
-        <button onClick={onClickLogin}>로그인</button>
-        <br/>
+        <h3>로그인</h3>
+        <FormBox onSubmit={onClickLogin}>
+          <input type="text" name="id" placeholder="아이디를 입력해 주세요"/>
+          <input type="text" name="password" placeholder="비밀번호를 입력해 주세요"/>
+          <button type="submit">로그인</button>
+        </FormBox>
         <br/>
         <div>{accountLogin && <textarea rows={4} value={JSON.stringify(accountLogin, null, 2)}readOnly={true}/>}</div>
       </div>
@@ -193,17 +204,24 @@ const App = () => {
         <button onClick={onClickPost}>게시글 작성</button>
         <div>{post && <textarea rows={4} value={JSON.stringify(post, null, 2)}readOnly={true}/>}</div>
       </div> */}
-      <form onSubmit={handleSubmit}>
+      <h3>내용 입력과 사진 추가</h3>
+      <FormBox onSubmit={handleSubmit}>
+        <input type="text" name="content" placeholder="내용을 입력해 주세요"/>
+        <br/>
         <input type="file" name="file" multiple/>
         <input type="file" name="file" multiple/>
         <input type="submit" value="Upload File"/>
-      </form>
+      </FormBox>
     </div>
   )
 }
 
 const LikeButton = styled.button`
   
+`
+
+const FormBox = styled.form`
+  background-color:lightblue;
 `
 
 export default App;
