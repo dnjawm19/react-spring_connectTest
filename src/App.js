@@ -31,7 +31,12 @@ const App = () => {
   const onClickGetPost2 = async () => {
     try{
       const response = await axios.get(
-        'http://localhost:8080/api/post',
+        'http://localhost:8080/api/post',{
+          headers: {
+            'Content-Type' : 'application/json',
+            'Access_Token' : getCookie('Access_Token')
+          }
+        }
       );
       setData2(response.data);
     }catch(e){
@@ -99,10 +104,10 @@ const App = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-
-    // construct form data
+    const content = "내용";
     const formData = new FormData(e.currentTarget);
     const files = e.currentTarget.files;
+    formData.append('content', content);
     for (let i = 0; i < files?.length; i++) {
       formData.append('files', files[i]);
     }
@@ -134,10 +139,12 @@ const App = () => {
         <button onClick={onClickGetPost2}>전체 게시글 조회2</button>
         {data2.map((post) => (
           <div key={post.id}>
-            <div>postId={post.id}</div>
-            <div>postTitle={post.title}</div>
-            <div>postUserEmail={post.userEmail}</div>
-            <div>postContent={post.contents}</div>
+            <div>postId = {post.postId}</div>
+            <div>postContent = {post.content}</div>
+            <div>{post.imgUrl.map((url) => (
+              <div>imgUrl={url}</div>   //키값이 없어서 불안정함 내일 백엔드에서 url을 post에 연관관계 지어서 안정적으로 만들어야 할거같음
+            ))}</div>
+            <br/>
           </div>
         ))}
       </div>
@@ -157,6 +164,7 @@ const App = () => {
         <div>{post && <textarea rows={4} value={JSON.stringify(post, null, 2)}readOnly={true}/>}</div>
       </div> */}
       <form onSubmit={handleSubmit}>
+        <input type="file" name="file" multiple/>
         <input type="file" name="file" multiple/>
         <input type="submit" value="Upload File"/>
       </form>
