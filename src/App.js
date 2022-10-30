@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import axios from 'axios';
 import { setCookie, getCookie, delCookie } from "./cookie/cookie";
+import styled from "styled-components";
 
 const App = () => {
   const [data,setData] = useState(null);
@@ -8,8 +9,6 @@ const App = () => {
   const [accountSignup,setAccountSignup] = useState(null);
   const [accountLogin,setAccountLogin] = useState(null);
   const [post,setPost] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedFileRes, setSelectedFileRes] = useState(null);
 
 
   const onClickGetPost = async () => {
@@ -127,16 +126,37 @@ const App = () => {
     }
   }
 
+  const onClickLike = async(e) => {
+    e.preventDefault();
+    try{
+      const response = await axios.post(
+        'http://localhost:8080/api/post/like',
+        e.currentTarget.value,
+        {
+          headers: {
+          'Access_Token' : getCookie('Access_Token'),
+          'Content-Type' : 'application/json'
+        }}
+        );
+        console.log(response.data);
+    }catch(e){
+      console.log(e);
+    }
+  }
+
   return (
     <div>
       <div>
       <div>
         <button onClick={onClickGetPost}>전체 게시글 조회</button>
       </div>
+      <br/>
       {data && <textarea rows={20} value={JSON.stringify(data, null, 2)}readOnly={true}/>}
       </div>
+      <br/>
       <div>
         <button onClick={onClickGetPost2}>전체 게시글 조회2</button>
+        <br/>
         {data2.map((post) => (
           <div key={post.id}>
             <div>postId = {post.postId}</div>
@@ -144,21 +164,31 @@ const App = () => {
             <div>{post.imgUrl.map((url) => (
               <div>imgUrl={url}</div>   //키값이 없어서 불안정함 내일 백엔드에서 url을 post에 연관관계 지어서 안정적으로 만들어야 할거같음
             ))}</div>
+            {post.likeCheck ? <LikeButton onClick={onClickLike} value={post.postId}>좋아요</LikeButton> :
+            <LikeButton onClick={onClickLike} value={post.postId}>좋아요취소</LikeButton>}
+            <br/>
             <br/>
           </div>
         ))}
       </div>
       <div>
         <button onClick={onClickSignup}>회원가입</button>
+        <br/>
+        <br/>
         <div>{accountSignup && <textarea rows={4} value={JSON.stringify(accountSignup, null, 2)}readOnly={true}/>}</div>
       </div>
+      <br/>
       <div>
         <button onClick={onClickLogin}>로그인</button>
+        <br/>
+        <br/>
         <div>{accountLogin && <textarea rows={4} value={JSON.stringify(accountLogin, null, 2)}readOnly={true}/>}</div>
       </div>
+      <br/>
       <div>
         <button onClick={onClickLogout}>로그아웃</button>
       </div>
+      <br/>
       {/* <div>
         <button onClick={onClickPost}>게시글 작성</button>
         <div>{post && <textarea rows={4} value={JSON.stringify(post, null, 2)}readOnly={true}/>}</div>
@@ -171,5 +201,9 @@ const App = () => {
     </div>
   )
 }
+
+const LikeButton = styled.button`
+  
+`
 
 export default App;
