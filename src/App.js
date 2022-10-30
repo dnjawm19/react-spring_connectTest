@@ -15,7 +15,12 @@ const App = () => {
   const onClickGetPost = async () => {
     try{
       const response = await axios.get(
-        'http://localhost:8080/api/showpost/recruittrue',
+        'http://localhost:8080/api/post',{
+          headers: {
+            'Content-Type' : 'application/json',
+            'Access_Token' : getCookie('Access_Token')
+          }
+        }
       );
       setData(response.data);
     }catch(e){
@@ -26,7 +31,7 @@ const App = () => {
   const onClickGetPost2 = async () => {
     try{
       const response = await axios.get(
-        'http://localhost:8080/api/showpost/recruittrue',
+        'http://localhost:8080/api/post',
       );
       setData2(response.data);
     }catch(e){
@@ -37,9 +42,9 @@ const App = () => {
   const onClickSignup = async () => {
     try{
       const response = await axios.post(
-        'http://localhost:8080/api/member/signup', {
-          "userid" : "211",
-          "nickname": "정수123",
+        'http://localhost:8080/auth/signup', {
+          "userName" : "211",
+          "nickName": "정수123",
           "password": "asd"
         }
       );
@@ -52,8 +57,8 @@ const App = () => {
   const onClickLogin = async () => {
     try{
       const response = await axios.post(
-        'http://localhost:8080/api/member/login', {
-          "userid" : "211",
+        'http://localhost:8080/auth/login', {
+          "userName" : "211",
           "password": "asd",
         },
       );
@@ -92,34 +97,30 @@ const App = () => {
   //   }
   // };
 
-  const handleSubmit = async(event) => {
-    event.preventDefault()
-    const formData = new FormData();
-    formData.append("selectedFile", selectedFile);
-    const headers = {
-      'Content-Type' : 'application/json',
-      'Access_Token' : getCookie('Access_Token')
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    // construct form data
+    const formData = new FormData(e.currentTarget);
+    const files = e.currentTarget.files;
+    for (let i = 0; i < files?.length; i++) {
+      formData.append('files', files[i]);
     }
     try{
       const response = await axios.post(
-        'http://localhost:8080/api/gamepost',
-        formData,{
-        headers: {
-        'Access_Token' : getCookie('Access_Token'),
-        'Content-Type' : 'multipart/form-data'
-      }}
+        'http://localhost:8080/api/post',
+        formData,
+        {
+          headers: {
+          'Access_Token' : getCookie('Access_Token'),
+          'Content-Type' : 'multipart/form-data'
+        }}
         );
         console.log(response.data);
     }catch(e){
-      console.log(headers);
       console.log(e);
     }
   }
-
-  const handleFileSelect = (event) => {
-    setSelectedFile(event.target.files[0])
-  }
-  
 
   return (
     <div>
@@ -156,7 +157,7 @@ const App = () => {
         <div>{post && <textarea rows={4} value={JSON.stringify(post, null, 2)}readOnly={true}/>}</div>
       </div> */}
       <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleFileSelect}/>
+        <input type="file" name="file" multiple/>
         <input type="submit" value="Upload File"/>
       </form>
     </div>
